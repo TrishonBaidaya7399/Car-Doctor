@@ -8,8 +8,6 @@ require('dotenv').config()
 app.use(cors());
 app.use(express.json());
 
-
-
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.c2jrci5.mongodb.net/?retryWrites=true&w=majority`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -47,13 +45,57 @@ async function run() {
         res.send(result);
     })
 
-    //set customer service data
+    //set booking data
     app.post('/bookings', async(req, res)=>{
       const booking = req.body;
      const result = await bookingCollection.insertOne(booking);
      res.send(result);
     } )
 
+    //get some booking data 
+
+    app.get('/bookings', async(req, res)=>{
+      let query = {};
+      if(req.query?.email){
+        query = {email: req.query.email}
+      }
+      const result = await bookingCollection.find(query).toArray();
+      res.send(result);
+    })
+
+    //update bookings
+    app.patch('/bookings/:id', async(req, res)=>{
+      const id = req.params.id;
+      const filter = {_id: new ObjectId(id)}
+      const updatedBooking = req.body;
+      console.log(updatedBooking);
+      const updatedDoc = {
+        $set: {
+          status: updatedBooking.status
+        }
+      }
+      const result = await bookingCollection.updateOne(filter, updatedDoc);
+      res.send(result);
+    })
+    
+    //remove bookings
+    app.delete('/bookings/:id', async(req, res)=>{
+      const id = req.params.id;
+      const query = {_id : new ObjectId(id)}
+      const result = await bookingCollection.deleteOne(query);
+      res.send(result);
+    })
+
+   // remove all bookings
+    app.delete('/bookings', async(req, res)=>{
+      let query = {};
+      if(req.query?.email){
+        query = {email: req.query.email}
+
+      }
+      const result = await bookingCollection.deleteMany(query);
+      res.send(result);
+    })
 
 
 
