@@ -40,7 +40,7 @@ async function run() {
     })
 
 
-//<------------------------------------Testimonials--------------------------------------------->
+//<------------------------------------Team--------------------------------------------->
     // Get all services data
     app.get('/team', async(req, res)=>{
         const cursor = teamCollection.find();
