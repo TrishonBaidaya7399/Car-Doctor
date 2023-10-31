@@ -1,6 +1,7 @@
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const express = require('express');
 const cors = require('cors');
+const jwt = require('jsonwebtoken');
 const app = express();
 const port = process.env.PORT || 5000;
 require('dotenv').config()
@@ -27,7 +28,33 @@ async function run() {
     // Get the database and collection on which to run the operation
     const serviceCollection = client.db("CarDoctor").collection("services");
     const bookingCollection = client.db("CarDoctor").collection("bookings");
-    
+    const testimonialsCollection = client.db("CarDoctor").collection("testimonials");
+    const teamCollection = client.db("CarDoctor").collection("team");
+
+//<------------------------------------Auth--------------------------------------------->
+    app.post('/jwt', async(req, res)=>{
+      const user = req.body;
+      console.log(user);
+      const token = jwt.sign(user, 'secret', {expiresIn: '1h'})
+      res.send(token);
+    })
+
+
+//<------------------------------------Testimonials--------------------------------------------->
+    // Get all services data
+    app.get('/team', async(req, res)=>{
+        const cursor = teamCollection.find();
+        const result = await cursor.toArray();
+        res.send(result);    
+    })
+//<------------------------------------Testimonials--------------------------------------------->
+    // Get all services data
+    app.get('/testimonials', async(req, res)=>{
+        const cursor = testimonialsCollection.find();
+        const result = await cursor.toArray();
+        res.send(result);    
+    })
+//<------------------------------------Services--------------------------------------------->
     // Get all services data
     app.get('/services', async(req, res)=>{
         const cursor = serviceCollection.find();
@@ -45,6 +72,7 @@ async function run() {
         res.send(result);
     })
 
+//<------------------------------------Booking--------------------------------------------->
     //set booking data
     app.post('/bookings', async(req, res)=>{
       const booking = req.body;
